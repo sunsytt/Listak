@@ -7,4 +7,13 @@
     <string name="filter_all">Todos</string>
     <string name="filter_pending">Pendientes</string>
     <string name="filter_completed">Completadas</string>
+
+    <string name="screen_title">Mis tareas</string>
+    <string name="summary_title">Resumen</string>
+    <string name="summary_pending">Pendientes: %1$d</string>
+    <string name="summary_completed">Completadas: %1$d</string>
+    <string name="summary_progress">Avance: %1$d%%</string>
+    <string name="empty_list">No hay tareas para mostrar</string>
+    <string name="delete_task">Eliminar tarea</string>
+
 </resources>
