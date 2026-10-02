@@ -56,4 +56,6 @@ class TaskViewModel : ViewModel(){
     fun onTitleChanged() {
         TODO("Not yet implemented")
     }
+
+    fun onAddTask(text: String) {}
 }

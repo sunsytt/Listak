@@ -29,6 +29,7 @@ fun TaskScreen(
     isEmpty: Any.() -> Boolean
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
+    var text by rememberSaveable { mutableStateOf("") }
 
     TaskInput(
         text = text,
@@ -59,6 +60,20 @@ fun TaskScreen(
             pendingCount = state.pendingCount,
             completedCount = state.completedCount,
             progressPercent = state.progressPercent
+        )
+        TaskInput(
+            text = text,
+            onTextChange = {
+                text = it
+                viewModel.onTitleChanged()
+            },
+            showError = state.showError,
+            selectedPriority = state.selectedPriority,
+            onPrioritySelected = viewModel::onPrioritySelected,
+            onAdd = {
+                viewModel.onAddTask(text)
+                text = ""
+            }
         )
         if (state.visibleTasks.isEmpty()) {
             Text(

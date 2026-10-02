@@ -16,4 +16,8 @@
     <string name="empty_list">No hay tareas para mostrar</string>
     <string name="delete_task">Eliminar tarea</string>
 
+    <string name="task_hint">Nueva tarea</string>
+    <string name="error_empty_task">Escribe el nombre de la tarea</string>
+    <string name="add_task">Agregar</string>
+
 </resources>
