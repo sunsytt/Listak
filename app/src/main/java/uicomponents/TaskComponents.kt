@@ -24,6 +24,10 @@ import androidx.compose.ui.unit.dp
 import androidx.test.espresso.base.Default
 import model.Priority
 import model.Task
+import androidx.compose.material3.Button
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 fun SummaryCard(
@@ -115,6 +119,68 @@ fun TaskItem(
     }
 }
 
+@Composable
+fun TaskInput(
+    text: String,
+    onTextChange: (String) -> Unit,
+    showError: Boolean,
+    selectedPriority: Priority,
+    onPrioritySelected: (Priority) -> Unit,
+    onAdd: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        OutlinedTextField(
+            value = text,
+            onValueChange = onTextChange,
+            label = { Text(text = stringResource(R.string.task_hint)) },
+            isError = showError,
+            supportingText = {
+                if (showError) {
+                    Text(text = stringResource(R.string.error_empty_task))
+                }
+            },
+            singleLine = true,
+            modifier = Modifier.fillMaxWidth()
+        )
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Priority.entries.forEach { priority ->
+                FilterChip(
+                    selected = priority == selectedPriority,
+                    onClick = { onPrioritySelected(priority) },
+                    label = { Text(text = stringResource(priority.labelRes)) }
+                )
+            }
+        }
+        Button(onClick = onAdd, modifier = Modifier.fillMaxWidth()) {
+            Text(text = stringResource(R.string.add_task))
+        }
+    }
+}
+
 class Icons(imageVector: Any, contentDescription: String) {
 
-} 
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun SummaryCardPreview() {
+    MaterialTheme {
+        SummaryCard(pendingCount = 2, completedCount = 1, progressPercent = 33)
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun TaskItemPreview() {
+    MaterialTheme {
+        TaskItem(
+            task = Task(id = 1, title = "Estudiar Compose", priority = Priority.ALTA),
+            onToggle = {},
+            onDelete = {}
+        )
+    }
+}

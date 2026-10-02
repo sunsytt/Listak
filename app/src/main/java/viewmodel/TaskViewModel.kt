@@ -19,7 +19,9 @@ data class TaskUiState(
     val pendingCount: Int = 0,
     val completedCount: Int = 0,
     val progressPercent: Int = 0
-)
+) {
+    val visibleTasks: Any
+}
 
 class TaskViewModel : ViewModel(){
     private val _uiState = MutableStateFlow(recalculate(TaskUiState(task = mockTasks)))
@@ -50,4 +52,8 @@ class TaskViewModel : ViewModel(){
         Task(id=2, title = "Repasar temas de programacion", priority = Priority.MEDIA),
         Task(id=3, title = "Ir de compras el sabado", priority = Priority.BAJA),
     )
+
+    fun onTitleChanged() {
+        TODO("Not yet implemented")
+    }
 }
