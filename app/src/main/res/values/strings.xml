@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Task</string>
+    <string name="priority_high">Alta</string>
+    <string name="priority_medium">Media</string>
+    <string name="priority_low">Baja</string>
+
+    <string name="filter_all">Todos</string>
+    <string name="filter_pending">Pendientes</string>
+    <string name="filter_completed">Completadas</string>
+</resources>
