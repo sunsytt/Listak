@@ -1,6 +1,7 @@
 package com.siyu.task.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
@@ -30,6 +32,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.siyu.task.R
+import com.siyu.task.model.Category
 import com.siyu.task.model.Priority
 import com.siyu.task.model.Task
 import com.siyu.task.ui.TaskScreen
@@ -130,6 +133,8 @@ fun TaskInput(
     showError: Boolean,
     selectedPriority: Priority,
     onPrioritySelected: (Priority) -> Unit,
+    selectedCategory: Category,
+    onCategorySelected: (Category) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -149,12 +154,28 @@ fun TaskInput(
             singleLine = true,
             modifier = Modifier.fillMaxWidth()
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             Priority.entries.forEach { priority ->
                 FilterChip(
                     selected = priority == selectedPriority,
                     onClick = { onPrioritySelected(priority) },
                     label = { Text(text = stringResource(priority.labelRes)) }
+                )
+            }
+        }
+        Row(
+            //uso de scroll horizontal??
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Category.entries.forEach { category ->
+                FilterChip(
+                    selected = category == selectedCategory,
+                    onClick = { onCategorySelected(category) },
+                    label = { Text(text = stringResource(category.labelRes)) }
                 )
             }
         }

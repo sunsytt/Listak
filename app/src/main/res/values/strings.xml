@@ -21,5 +21,10 @@
     <string name="add_task">Agregar</string>
     <string name="cancel">Cancelar</string>
 
+    <string name="category_personal">Personal</string>
+    <string name="category_studies">Estudios\n</string>
+    <string name="category_work">Trabajo</string>
+    <string name="category_home">Hogar</string>
+
 
 </resources>

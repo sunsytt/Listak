@@ -1,6 +1,7 @@
 package com.siyu.task.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.siyu.task.model.Category
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,12 +19,17 @@ data class TaskUiState(
     val visibleTasks: List<Task> = emptyList(),
     val pendingCount: Int = 0,
     val completedCount: Int = 0,
-    val progressPercent: Int = 0
-)
+    val progressPercent: Int = 0,
+    val category: Category = Category.ESTUDIOS
+) {
+    //Pasa a categoria como parametro..??
+    val selectedCategory:  Category = category
+}
+
 
 class TaskViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(recalculate(TaskUiState(task = mockTasks())))
-    val uiState: StateFlow<TaskUiState> = _uiState.asStateFlow()
+    val uiState: StateFlow<TaskUiState> = _uiState.asStateFlow ()
 
     private fun recalculate(state: TaskUiState): TaskUiState {
         val filtered = when (state.filter) {
@@ -47,9 +53,9 @@ class TaskViewModel : ViewModel() {
     }
 
     private fun mockTasks(): List<Task> = listOf(
-        Task(id = 1, title = "Estudiar para examen de calculo -miercoles", priority = Priority.ALTA),
-        Task(id = 2, title = "Repasar temas de programacion", priority = Priority.MEDIA),
-        Task(id = 3, title = "Ir de compras el sabado", priority = Priority.BAJA)
+        Task(id = 1, title = "Estudiar para examen de calculo -miercoles", priority = Priority.ALTA, category = Category.ESTUDIOS),
+        Task(id = 2, title = "Repasar temas de programacion", priority = Priority.MEDIA, category = Category.ESTUDIOS),
+        Task(id = 3, title = "Ir de compras el sabado", priority = Priority.BAJA, category = Category.HOGAR)
     )
 
     fun onTitleChanged() {
@@ -64,6 +70,9 @@ class TaskViewModel : ViewModel() {
         _uiState.value = recalculate(_uiState.value.copy(filter = filter))
     }
 
+    fun onCategorySelected(category: Category) {
+        _uiState.value = recalculate(_uiState.value.copy(category = category))
+    }
     fun onAddTask(title: String): Boolean {
         val cleanTitle = title.trim()
         if (cleanTitle.isEmpty()) {
@@ -71,15 +80,16 @@ class TaskViewModel : ViewModel() {
             return false
         }
         _uiState.update { current ->
-            val newId = current.task.size + 1
+            val newId = (current.task.maxOfOrNull { it.id } ?: 0) + 1
             val newTask = Task(
                 id = newId,
                 title = cleanTitle,
-                priority = _uiState.value.selectedPriority
-                recalculate(current.copy(tasks = current.task + newTask, showError = false))
+                priority = current.selectedPriority,
+                category = current.selectedCategory
             )
-            return true
+            recalculate(current.copy(task = current.task + newTask, showError = false))
         }
+        return true
     }
 
     fun onToggleTask(id: Int) {

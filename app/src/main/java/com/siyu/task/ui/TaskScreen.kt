@@ -129,7 +129,9 @@ fun TaskScreen(
                     },
                     showError = state.showError,
                     selectedPriority = state.selectedPriority,
-                    onPrioritySelected = viewModel::onPrioritySelected
+                    onPrioritySelected = { viewModel.onPrioritySelected(it) },
+                    selectedCategory = state.selectedCategory,
+                    onCategorySelected = { viewModel.onCategorySelected(it) }
                 )
             },
             confirmButton = {
