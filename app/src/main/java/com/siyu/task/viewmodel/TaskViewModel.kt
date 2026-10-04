@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import com.siyu.task.model.Priority
 import com.siyu.task.model.Task
 import com.siyu.task.model.TaskFilter
+import kotlinx.coroutines.flow.update
 
 data class TaskUiState(
     val task: List<Task> = emptyList(),
@@ -63,19 +64,22 @@ class TaskViewModel : ViewModel() {
         _uiState.value = recalculate(_uiState.value.copy(filter = filter))
     }
 
-    fun onAddTask(title: String) {
-        if (title.isBlank()) {
-            _uiState.value = _uiState.value.copy(showError = true)
-            return
+    fun onAddTask(title: String): Boolean {
+        val cleanTitle = title.trim()
+        if (cleanTitle.isEmpty()) {
+            _uiState.update { it.copy(showError = true) }
+            return false
         }
-        val newTask = Task(
-            id = (_uiState.value.task.maxOfOrNull { it.id } ?: 0) + 1,
-            title = title.trim(),
-            priority = _uiState.value.selectedPriority,
-            done = false
-        )
-        val updatedTasks = _uiState.value.task + newTask
-        _uiState.value = recalculate(_uiState.value.copy(task = updatedTasks, showError = false))
+        _uiState.update { current ->
+            val newId = current.task.size + 1
+            val newTask = Task(
+                id = newId,
+                title = cleanTitle,
+                priority = _uiState.value.selectedPriority
+                recalculate(current.copy(tasks = current.task + newTask, showError = false))
+            )
+            return true
+        }
     }
 
     fun onToggleTask(id: Int) {

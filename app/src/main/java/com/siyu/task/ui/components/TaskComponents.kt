@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
@@ -131,7 +130,6 @@ fun TaskInput(
     showError: Boolean,
     selectedPriority: Priority,
     onPrioritySelected: (Priority) -> Unit,
-    onAdd: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -159,9 +157,6 @@ fun TaskInput(
                     label = { Text(text = stringResource(priority.labelRes)) }
                 )
             }
-        }
-        Button(onClick = onAdd, modifier = Modifier.fillMaxWidth()) {
-            Text(text = stringResource(R.string.add_task))
         }
     }
 }

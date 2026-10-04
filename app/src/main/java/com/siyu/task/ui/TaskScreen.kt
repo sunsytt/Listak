@@ -2,18 +2,21 @@ package com.siyu.task.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -36,36 +39,48 @@ import com.siyu.task.viewmodel.TaskViewModel
 @Composable
 fun TaskScreen(
     modifier: Modifier = Modifier,
-    viewModel: TaskViewModel = viewModel(),
+    viewModel: TaskViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var text by rememberSaveable { mutableStateOf("") }
-    var showDialog by rememberSaveable { mutableStateOf(true) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
 
+    // Cierra el diálogo, vacía el texto y quita el error.
+    // Se usa al cancelar, al tocar fuera y al agregar con éxito.
+    val closeDialog = {
+        showDialog = false
+        text = ""
+        viewModel.onTitleChanged()
+    }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = stringResource(R.string.app_name))},
+                title = { Text(text = stringResource(R.string.app_name)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.onPrimary,
+                    titleContentColor = MaterialTheme.colorScheme.primary
                 )
             )
-        }, floatingActionButton = {
+        },
+        floatingActionButton = {
             FloatingActionButton(
-                onClick = { viewModel.onAddTask(text) },
+                onClick = { showDialog = true },
                 containerColor = MaterialTheme.colorScheme.primary,
                 contentColor = MaterialTheme.colorScheme.onPrimary
             ) {
-                Icon(Icons.Default.Add, contentDescription = stringResource(R.string.add_task))
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = stringResource(R.string.add_task)
+                )
             }
         }
-    ){ paddingValues ->
-
+    ) { paddingValues ->
         Column(
             modifier = modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             Text(
@@ -77,20 +92,6 @@ fun TaskScreen(
                 completedCount = state.completedCount,
                 progressPercent = state.progressPercent
             )
-            TaskInput(
-                text = text,
-                onTextChange = {
-                    text = it
-                    viewModel.onTitleChanged()
-                },
-                showError = state.showError,
-                selectedPriority = state.selectedPriority,
-                onPrioritySelected = viewModel::onPrioritySelected,
-                onAdd = {
-                    viewModel.onAddTask(text)
-                    text = ""
-                }
-            )
             if (state.visibleTasks.isEmpty()) {
                 Text(
                     text = stringResource(R.string.empty_list),
@@ -99,7 +100,9 @@ fun TaskScreen(
             } else {
                 LazyColumn(
                     modifier = Modifier.weight(1f),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    // Espacio abajo para que el botón flotante no tape la última tarea
+                    contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
                     items(items = state.visibleTasks, key = { it.id }) { task ->
                         TaskItem(
@@ -112,5 +115,43 @@ fun TaskScreen(
             }
         }
     }
-}
 
+    if (showDialog) {
+        AlertDialog(
+            onDismissRequest = { closeDialog() },
+            title = { Text(text = stringResource(R.string.add_task)) },
+            text = {
+                TaskInput(
+                    text = text,
+                    onTextChange = {
+                        text = it
+                        viewModel.onTitleChanged()
+                    },
+                    showError = state.showError,
+                    selectedPriority = state.selectedPriority,
+                    onPrioritySelected = viewModel::onPrioritySelected
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val added = viewModel.onAddTask(text)
+                        if (added) {
+                            closeDialog()
+                        }
+                    }
+                ) {
+                    Text(text = stringResource(R.string.add_task))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { closeDialog() }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+            containerColor = MaterialTheme.colorScheme.background,
+            titleContentColor = MaterialTheme.colorScheme.onBackground,
+            textContentColor = MaterialTheme.colorScheme.onBackground
+        )
+    }
+}
