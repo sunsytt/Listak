@@ -1,0 +1,92 @@
+package com.siyu.task.viewmodel
+
+import androidx.lifecycle.ViewModel
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import com.siyu.task.model.Priority
+import com.siyu.task.model.Task
+import com.siyu.task.model.TaskFilter
+
+data class TaskUiState(
+    val task: List<Task> = emptyList(),
+    val filter: TaskFilter = TaskFilter.TODAS,
+    val sortByPriority: Boolean = false,
+    val selectedPriority: Priority = Priority.MEDIA,
+    val showError: Boolean = false,
+    val visibleTasks: List<Task> = emptyList(),
+    val pendingCount: Int = 0,
+    val completedCount: Int = 0,
+    val progressPercent: Int = 0
+)
+
+class TaskViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(recalculate(TaskUiState(task = mockTasks())))
+    val uiState: StateFlow<TaskUiState> = _uiState.asStateFlow()
+
+    private fun recalculate(state: TaskUiState): TaskUiState {
+        val filtered = when (state.filter) {
+            TaskFilter.TODAS -> state.task
+            TaskFilter.PENDIENTES -> state.task.filter { !it.done }
+            TaskFilter.COMPLETADAS -> state.task.filter { it.done }
+        }
+        val visible = if (state.sortByPriority) {
+            filtered.sortedBy { it.priority.ordinal }
+        } else {
+            filtered
+        }
+        val completed = state.task.count { it.done }
+        val percent = if (state.task.isEmpty()) 0 else completed * 100 / state.task.size
+        return state.copy(
+            visibleTasks = visible,
+            pendingCount = state.task.size - completed,
+            completedCount = completed,
+            progressPercent = percent
+        )
+    }
+
+    private fun mockTasks(): List<Task> = listOf(
+        Task(id = 1, title = "Estudiar para examen de calculo -miercoles", priority = Priority.ALTA),
+        Task(id = 2, title = "Repasar temas de programacion", priority = Priority.MEDIA),
+        Task(id = 3, title = "Ir de compras el sabado", priority = Priority.BAJA)
+    )
+
+    fun onTitleChanged() {
+        _uiState.value = _uiState.value.copy(showError = false)
+    }
+
+    fun onPrioritySelected(priority: Priority) {
+        _uiState.value = recalculate(_uiState.value.copy(selectedPriority = priority))
+    }
+
+    fun onFilterSelected(filter: TaskFilter) {
+        _uiState.value = recalculate(_uiState.value.copy(filter = filter))
+    }
+
+    fun onAddTask(title: String) {
+        if (title.isBlank()) {
+            _uiState.value = _uiState.value.copy(showError = true)
+            return
+        }
+        val newTask = Task(
+            id = (_uiState.value.task.maxOfOrNull { it.id } ?: 0) + 1,
+            title = title.trim(),
+            priority = _uiState.value.selectedPriority,
+            done = false
+        )
+        val updatedTasks = _uiState.value.task + newTask
+        _uiState.value = recalculate(_uiState.value.copy(task = updatedTasks, showError = false))
+    }
+
+    fun onToggleTask(id: Int) {
+        val updatedTasks = _uiState.value.task.map {
+            if (it.id == id) it.copy(done = !it.done) else it
+        }
+        _uiState.value = recalculate(_uiState.value.copy(task = updatedTasks))
+    }
+
+    fun onDeleteTask(id: Int) {
+        val updatedTasks = _uiState.value.task.filter { it.id != id }
+        _uiState.value = recalculate(_uiState.value.copy(task = updatedTasks))
+    }
+}

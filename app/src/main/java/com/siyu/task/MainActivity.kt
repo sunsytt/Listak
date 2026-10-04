@@ -4,20 +4,14 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.siyu.task.ui.theme.TaskTheme
-import model.Priority
-import model.Task
-import ui.SummaryCard
-import ui.TaskItem
-import ui.TaskScreen
+import com.siyu.task.model.Priority
+import com.siyu.task.model.Task
+import com.siyu.task.ui.TaskScreen
+import com.siyu.task.ui.components.SummaryCard
+import com.siyu.task.ui.components.TaskItem
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,9 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    TaskScreen(modifier = Modifier.padding(innerPadding))
-                }
+                TaskScreen()
             }
         }
     }
@@ -36,7 +28,7 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 private fun SummaryCardPreview() {
-    MaterialTheme {
+    TaskTheme {
         SummaryCard(pendingCount = 2, completedCount = 1, progressPercent = 33)
     }
 }
@@ -44,7 +36,7 @@ private fun SummaryCardPreview() {
 @Preview(showBackground = true)
 @Composable
 private fun TaskItemPreview() {
-    MaterialTheme {
+    TaskTheme {
         TaskItem(
             task = Task(id = 1, title = "Estudiar Compose", priority = Priority.ALTA),
             onToggle = {},
@@ -52,4 +44,3 @@ private fun TaskItemPreview() {
         )
     }
 }
-
