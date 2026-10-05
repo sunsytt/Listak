@@ -20,10 +20,10 @@ data class TaskUiState(
     val pendingCount: Int = 0,
     val completedCount: Int = 0,
     val progressPercent: Int = 0,
-    val category: Category = Category.ESTUDIOS
+    val selectedCategory: Category = Category.ESTUDIOS,
+    val groupedTasks: Map<Category, List<Task>> = emptyMap()
 ) {
-    //Pasa a categoria como parametro..??
-    val selectedCategory:  Category = category
+
 }
 
 
@@ -37,15 +37,22 @@ class TaskViewModel : ViewModel() {
             TaskFilter.PENDIENTES -> state.task.filter { !it.done }
             TaskFilter.COMPLETADAS -> state.task.filter { it.done }
         }
+        //ordena por prioridad
         val visible = if (state.sortByPriority) {
             filtered.sortedBy { it.priority.ordinal }
         } else {
             filtered
         }
+        //agrupacion de tareas por categoria
+        val grouped = visible
+            .sortedBy { it.category.ordinal }
+            .groupBy { it.category }
+
         val completed = state.task.count { it.done }
         val percent = if (state.task.isEmpty()) 0 else completed * 100 / state.task.size
         return state.copy(
             visibleTasks = visible,
+            groupedTasks = grouped,
             pendingCount = state.task.size - completed,
             completedCount = completed,
             progressPercent = percent
@@ -71,7 +78,7 @@ class TaskViewModel : ViewModel() {
     }
 
     fun onCategorySelected(category: Category) {
-        _uiState.value = recalculate(_uiState.value.copy(category = category))
+        _uiState.value = recalculate(_uiState.value.copy(selectedCategory = Category.ESTUDIOS))
     }
     fun onAddTask(title: String): Boolean {
         val cleanTitle = title.trim()

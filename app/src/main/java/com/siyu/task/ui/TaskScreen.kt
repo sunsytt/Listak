@@ -33,13 +33,15 @@ import com.siyu.task.R
 import com.siyu.task.ui.components.SummaryCard
 import com.siyu.task.ui.components.TaskInput
 import com.siyu.task.ui.components.TaskItem
+import com.siyu.task.ui.components.labelRes
 import com.siyu.task.viewmodel.TaskViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TaskScreen(
     modifier: Modifier = Modifier,
-    viewModel: TaskViewModel = viewModel()
+    viewModel: TaskViewModel = viewModel(),
+    animateItemPlacement: Modifier.Companion.() -> Modifier
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var text by rememberSaveable { mutableStateOf("") }
@@ -104,12 +106,20 @@ fun TaskScreen(
                     // Espacio abajo para que el botón flotante no tape la última tarea
                     contentPadding = PaddingValues(bottom = 80.dp)
                 ) {
-                    items(items = state.visibleTasks, key = { it.id }) { task ->
-                        TaskItem(
-                            task = task,
-                            onToggle = { viewModel.onToggleTask(task.id) },
-                            onDelete = { viewModel.onDeleteTask(task.id) }
-                        )
+                    state.groupedTasks.forEach { category, tasks ->
+                        item(key = "header_$category") {
+                            Text(
+                                text = stringResource(category.labelRes),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        }
+                        items(items = tasks, key = { it.id }) { task ->
+                            TaskItem(
+                                task = task,
+                                onToggle = { viewModel.onToggleTask(task.id) },
+                                onDelete = { viewModel.onDeleteTask(task.id) }
+                            )
+                        }
                     }
                 }
             }

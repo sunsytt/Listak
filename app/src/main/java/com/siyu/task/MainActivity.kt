@@ -19,7 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TaskTheme {
-                TaskScreen()
+                TaskScree()
             }
         }
     }
@@ -40,7 +40,16 @@ private fun TaskItemPreview() {
         TaskItem(
             task = Task(id = 1, title = "Estudiar Compose", priority = Priority.ALTA),
             onToggle = {},
-            onDelete = {}
+            onDelete = {},
+            unit = state.groupedTasks forEach { (category, tasks) ->
+                item(key = category) {
+                    Text(
+                        text = stringResource(category.labelRes),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                    )
+                }
+            }
         )
     }
 }

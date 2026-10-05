@@ -80,7 +80,8 @@ fun TaskItem(
     task: Task,
     onToggle: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    unit: Unit
 ) {
     val priorityColor = when (task.priority) {
         Priority.ALTA -> MaterialTheme.colorScheme.error

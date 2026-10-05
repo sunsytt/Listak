@@ -19,6 +19,7 @@ val TaskFilter.labelRes: Int
         TaskFilter.PENDIENTES -> R.string.filter_pending
         TaskFilter.COMPLETADAS -> R.string.filter_completed
     }
+
 val Category.labelRes: Int
     get() = when (this) {
         Category.ESTUDIOS -> R.string.category_studies
