@@ -30,14 +30,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.siyu.task.R
+import com.siyu.task.ui.components.FilterBar
 import com.siyu.task.ui.components.SummaryCard
 import com.siyu.task.ui.components.TaskInput
 import com.siyu.task.ui.components.TaskItem
 import com.siyu.task.ui.components.labelRes
+import com.siyu.task.ui.theme.TaskTheme
 import com.siyu.task.viewmodel.TaskViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,6 +99,12 @@ fun TaskScreen(
                 pendingCount = state.pendingCount,
                 completedCount = state.completedCount,
                 progressPercent = state.progressPercent
+            )
+            FilterBar(
+                selectedFilter = state.filter,
+                onFilterSelected = { viewModel.onFilterSelected(it) },
+                onSortChanged = { viewModel.onShortChanged(it) },
+                sortByPriority = state.sortByPriority
             )
             if (state.visibleTasks.isEmpty()) {
                 Text(
@@ -171,5 +180,13 @@ fun TaskScreen(
             titleContentColor = MaterialTheme.colorScheme.onBackground,
             textContentColor = MaterialTheme.colorScheme.onBackground
         )
+    }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun TaskScreenPreview() {
+    TaskTheme  {
+        TaskScreen()
     }
 }

@@ -1,18 +1,16 @@
 package com.siyu.task.ui.components
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
@@ -24,20 +22,21 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.siyu.task.R
 import com.siyu.task.model.Category
 import com.siyu.task.model.Priority
 import com.siyu.task.model.Task
-import com.siyu.task.ui.TaskScreen
+import com.siyu.task.model.TaskFilter
 
 @Composable
 fun SummaryCard(
@@ -51,7 +50,12 @@ fun SummaryCard(
         progressPercent < 80 -> MaterialTheme.colorScheme.tertiary
         else -> MaterialTheme.colorScheme.primary
     }
-    Card(modifier = modifier.fillMaxWidth()) {
+    Card ( modifier = modifier
+        .fillMaxWidth(),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+    )
+    {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
                 text = stringResource(R.string.summary_title),
@@ -84,10 +88,10 @@ fun TaskItem(
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val priorityColor = when (task.priority) {
-        Priority.ALTA -> MaterialTheme.colorScheme.error
-        Priority.MEDIA -> MaterialTheme.colorScheme.tertiary
-        Priority.BAJA -> MaterialTheme.colorScheme.primary
+    val cardColor = when (task.priority) {
+        Priority.ALTA -> MaterialTheme.colorScheme.primaryContainer
+        Priority.MEDIA -> MaterialTheme.colorScheme.tertiaryContainer
+        Priority.BAJA -> MaterialTheme.colorScheme.secondaryContainer
     }
     val titleColor = if (task.done) {
         MaterialTheme.colorScheme.onSurfaceVariant
@@ -95,41 +99,47 @@ fun TaskItem(
         MaterialTheme.colorScheme.onSurface
     }
 
-    Card(modifier = modifier
-        .fillMaxWidth(),
-        containerColor = CardDefaults.cardColors
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(1f)
+            .alpha(if (task.done) 0.5f else 1f),
+        colors = CardDefaults.cardColors(
+            containerColor = cardColor,
+            contentColor = MaterialTheme.colorScheme.onBackground
+        ),
+        border = BorderStroke( 1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Column(modifier = Modifier
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         ) {
-            Checkbox(checked = task.done, onCheckedChange = { onToggle() })
-            Spacer(modifier = Modifier.weight(1f))
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.delete_task)
-                )
+            Row(verticalAlignment = Alignment.CenterVertically){
+                Checkbox(checked = task.done, onCheckedChange = { onToggle() })
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete_task)
+                    )
+                }
             }
-            Column(modifier = Modifier.weight(1f),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text(
-                    text = task.title,
-                    maxLines = 5,
-                    color = titleColor,
-                    overflow = TextOverflow.Ellipsis,
-                    textDecoration = if (task.done) TextDecoration.LineThrough else TextDecoration.None
-                )
-                Text(
-                    text = stringResource(task.priority.labelRes),
-                    style = MaterialTheme.typography.labelMedium
-                )
-            }
-
+            Text(
+                text = task.title,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis,
+                color = titleColor,
+                textDecoration = if (task.done) TextDecoration.LineThrough else TextDecoration.None,
+                modifier = Modifier.weight(1f)
+            )
+            Text(
+                text = stringResource(task.priority.labelRes),
+                style = MaterialTheme.typography.labelMedium
+            )
         }
     }
 }
+
 
 @Composable
 fun TaskInput(
@@ -187,11 +197,32 @@ fun TaskInput(
     }
 }
 
-
-@Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun TaskScreenPreview() {
-    MaterialTheme {
-        TaskScreen()
+fun FilterBar (
+    selectedFilter: TaskFilter,
+    onFilterSelected: (TaskFilter) -> Unit,
+    onSortChanged: (Boolean) -> Unit,
+    sortByPriority: Boolean,
+    modifier: Modifier = Modifier
+){
+    Column(modifier = modifier.fillMaxWidth()) {
+        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            TaskFilter.entries.forEach { filter ->
+                FilterChip(
+                    selected = filter == selectedFilter,
+                    onClick = { onFilterSelected(filter) },
+                    label = { Text(text = stringResource(filter.labelRes)) }
+                )
+            }
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = stringResource(R.string.sort_by_priority))
+                Switch(checked = sortByPriority, onCheckedChange = onSortChanged)
+            }
+        }
     }
 }
+

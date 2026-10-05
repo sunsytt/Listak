@@ -110,4 +110,15 @@ class TaskViewModel : ViewModel() {
         val updatedTasks = _uiState.value.task.filter { it.id != id }
         _uiState.value = recalculate(_uiState.value.copy(task = updatedTasks))
     }
+
+    fun onShortChanged(enabled: Boolean){
+        _uiState.value = recalculate(_uiState.value.copy(sortByPriority = enabled))
+    }
+
+    fun onClearCompleted(){
+        val updatedTasks = _uiState.value.task.filter { !it.done }
+        _uiState.value = recalculate(_uiState.value.copy(task = updatedTasks))
+    }
 }
+
+
