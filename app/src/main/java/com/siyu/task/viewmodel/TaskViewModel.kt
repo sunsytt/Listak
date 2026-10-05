@@ -78,7 +78,7 @@ class TaskViewModel : ViewModel() {
     }
 
     fun onCategorySelected(category: Category) {
-        _uiState.value = recalculate(_uiState.value.copy(selectedCategory = Category.ESTUDIOS))
+        _uiState.value = recalculate(_uiState.value.copy(selectedCategory = category))
     }
     fun onAddTask(title: String): Boolean {
         val cleanTitle = title.trim()

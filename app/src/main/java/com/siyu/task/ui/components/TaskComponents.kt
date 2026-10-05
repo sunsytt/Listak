@@ -37,6 +37,7 @@ import com.siyu.task.model.Category
 import com.siyu.task.model.Priority
 import com.siyu.task.model.Task
 import com.siyu.task.model.TaskFilter
+import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun SummaryCard(
@@ -53,7 +54,9 @@ fun SummaryCard(
     Card ( modifier = modifier
         .fillMaxWidth(),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+                contentColor = MaterialTheme.colorScheme.onBackground)
     )
     {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -201,8 +204,8 @@ fun TaskInput(
 fun FilterBar (
     selectedFilter: TaskFilter,
     onFilterSelected: (TaskFilter) -> Unit,
-    onSortChanged: (Boolean) -> Unit,
-    sortByPriority: Boolean,
+    onSortChanged = viewModel::onSortChanged,
+    sortByPriority = state.sortByPriority,
     modifier: Modifier = Modifier
 ){
     Column(modifier = modifier.fillMaxWidth()) {
@@ -214,14 +217,14 @@ fun FilterBar (
                     label = { Text(text = stringResource(filter.labelRes)) }
                 )
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(text = stringResource(R.string.sort_by_priority))
-                Switch(checked = sortByPriority, onCheckedChange = onSortChanged)
-            }
+        }
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = stringResource(R.string.sort_by_priority))
+            Switch(checked = sortByPriority, onCheckedChange = onSortChanged)
         }
     }
 }
