@@ -37,7 +37,6 @@ import com.siyu.task.model.Category
 import com.siyu.task.model.Priority
 import com.siyu.task.model.Task
 import com.siyu.task.model.TaskFilter
-import androidx.lifecycle.viewmodel.compose.viewModel
 
 @Composable
 fun SummaryCard(
@@ -204,8 +203,8 @@ fun TaskInput(
 fun FilterBar (
     selectedFilter: TaskFilter,
     onFilterSelected: (TaskFilter) -> Unit,
-    onSortChanged = viewModel::onSortChanged,
-    sortByPriority = state.sortByPriority,
+    onSortChanged: (Boolean) -> Unit,
+    sortByPriority: Boolean,
     modifier: Modifier = Modifier
 ){
     Column(modifier = modifier.fillMaxWidth()) {
