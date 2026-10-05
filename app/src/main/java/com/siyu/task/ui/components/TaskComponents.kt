@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -29,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.siyu.task.R
@@ -80,8 +82,7 @@ fun TaskItem(
     task: Task,
     onToggle: () -> Unit,
     onDelete: () -> Unit,
-    modifier: Modifier = Modifier,
-    unit: Unit
+    modifier: Modifier = Modifier
 ) {
     val priorityColor = when (task.priority) {
         Priority.ALTA -> MaterialTheme.colorScheme.error
@@ -94,16 +95,30 @@ fun TaskItem(
         MaterialTheme.colorScheme.onSurface
     }
 
-    Card(modifier = modifier.fillMaxWidth()) {
-        Row(
+    Card(modifier = modifier
+        .fillMaxWidth(),
+        containerColor = CardDefaults.cardColors
+    ) {
+        Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Checkbox(checked = task.done, onCheckedChange = { onToggle() })
-            Column(modifier = Modifier.weight(1f)) {
+            Spacer(modifier = Modifier.weight(1f))
+            IconButton(onClick = onDelete) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.delete_task)
+                )
+            }
+            Column(modifier = Modifier.weight(1f),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
                 Text(
                     text = task.title,
+                    maxLines = 5,
                     color = titleColor,
+                    overflow = TextOverflow.Ellipsis,
                     textDecoration = if (task.done) TextDecoration.LineThrough else TextDecoration.None
                 )
                 Text(
@@ -111,18 +126,7 @@ fun TaskItem(
                     style = MaterialTheme.typography.labelMedium
                 )
             }
-            Box(
-                modifier = Modifier
-                    .padding(end = 4.dp)
-                    .size(12.dp)
-                    .background(color = priorityColor, shape = CircleShape)
-            )
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.delete_task)
-                )
-            }
+
         }
     }
 }

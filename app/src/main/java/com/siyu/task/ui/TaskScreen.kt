@@ -6,6 +6,10 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -40,8 +44,7 @@ import com.siyu.task.viewmodel.TaskViewModel
 @Composable
 fun TaskScreen(
     modifier: Modifier = Modifier,
-    viewModel: TaskViewModel = viewModel(),
-    animateItemPlacement: Modifier.Companion.() -> Modifier
+    viewModel: TaskViewModel = viewModel()
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     var text by rememberSaveable { mutableStateOf("") }
@@ -100,14 +103,17 @@ fun TaskScreen(
                     modifier = Modifier.weight(1f)
                 )
             } else {
-                LazyColumn(
+                LazyVerticalGrid (
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(8.dp),
-                    // Espacio abajo para que el botón flotante no tape la última tarea
-                    contentPadding = PaddingValues(bottom = 80.dp)
+                    contentPadding = PaddingValues(bottom = 80.dp),
+                    columns = GridCells.Adaptive(160.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
                     state.groupedTasks.forEach { category, tasks ->
-                        item(key = "header_$category") {
+                        item(key = "header_$category",
+                            span = { GridItemSpan(maxLineSpan) }
+                        ){
                             Text(
                                 text = stringResource(category.labelRes),
                                 style = MaterialTheme.typography.titleMedium
