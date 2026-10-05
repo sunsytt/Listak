@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Task</string>
+    <string name="app_name">Tasklist</string>
     <string name="priority_high">Alta</string>
     <string name="priority_medium">Media</string>
     <string name="priority_low">Baja</string>
@@ -27,6 +27,9 @@
     <string name="category_studies">Estudios\n</string>
     <string name="category_work">Trabajo</string>
     <string name="category_home">Hogar</string>
+
+    <string name="priority_label">Prioridad</string>
+    <string name="category_label">Categoría</string>
 
 
 
